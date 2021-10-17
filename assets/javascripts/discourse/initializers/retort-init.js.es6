@@ -20,7 +20,7 @@ function initializePlugin(api) {
 
   if (!retort_enabled) { return }
 
-  api.decorateWidget('post-menu:before-extra-controls', helper => {
+  api.decorateWidget('post-contents:after-cooked', helper => {
     let postId = helper.getModel().id
     let post   = Retort.postFor(postId)
 
