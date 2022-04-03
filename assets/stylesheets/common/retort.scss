@@ -1,7 +1,10 @@
 // .topic-post .topic-body { z-index: 3; }
 
 .post-retort {
-  float: left;
+  float: none;
+  border: none;
+  background: none;
+  margin: 0px 2px;
   padding: 2px;
   z-index: 1;
   position: relative;

@@ -4,7 +4,8 @@
 # authors: James Kiesel (gdpelican)
 # url: https://github.com/gdpelican/retort
 
-register_asset "stylesheets/retort.scss"
+register_asset "stylesheets/common/retort.scss"
+register_asset "stylesheets/mobile/retort.scss", :mobile
 
 RETORT_PLUGIN_NAME ||= "retort".freeze
 
