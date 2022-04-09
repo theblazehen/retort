@@ -50,6 +50,8 @@ function initializePlugin(api) {
   if (!User.current()) { return }
 
   api.modifyClass('route:topic', {
+    pluginId: 'retort',
+
     setupController(controller, model) {
       Retort.initialize(messageBus, model)
 
@@ -73,7 +75,8 @@ function initializePlugin(api) {
   })
 
   api.modifyClass('component:emoji-picker', {
-    
+    pluginId: 'retort',
+
     @computed('retort')
     limited() {
       return this.retort && retort_limited_emoji_set
