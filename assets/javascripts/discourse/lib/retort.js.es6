@@ -1,4 +1,4 @@
-import { ajax } from 'discourse/lib/ajax'
+import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import { getOwner } from "discourse-common/lib/get-owner";
 
@@ -7,66 +7,77 @@ export default Ember.Object.create({
 
   initialize(messageBus, topic) {
     if (this.topic.id) {
-      messageBus.unsubscribe(`/retort/topics/${this.topic.id}`)
+      messageBus.unsubscribe(`/retort/topics/${this.topic.id}`);
     }
 
-    this.set('topic', topic)
-    messageBus.subscribe(`/retort/topics/${this.topic.id}`, ({ id, retorts }) => {
-      const post = this.postFor(id)
-      if (!post) { return }
+    this.set("topic", topic);
+    messageBus.subscribe(
+      `/retort/topics/${this.topic.id}`,
+      ({ id, retorts }) => {
+        const post = this.postFor(id);
+        if (!post) {
+          return;
+        }
 
-      post.setProperties({ retorts })
-      this.get(`widgets.${id}`).scheduleRerender()
-    })
+        post.setProperties({ retorts });
+        this.get(`widgets.${id}`).scheduleRerender();
+      }
+    );
 
     const siteSettings = getOwner(this).lookup("site-settings:main");
-    this.set('siteSettings', siteSettings);
+    this.set("siteSettings", siteSettings);
   },
 
   postFor(id) {
-    return (this.get('topic.postStream.posts') || []).find(p => p.id == id)
+    return (this.get("topic.postStream.posts") || []).find((p) => p.id == id);
   },
 
   storeWidget(helper) {
-    if (!this.get('widgets')) { this.set('widgets', {}) }
-    this.set(`widgets.${helper.getModel().id}`, helper.widget)
+    if (!this.get("widgets")) {
+      this.set("widgets", {});
+    }
+    this.set(`widgets.${helper.getModel().id}`, helper.widget);
   },
 
   updateRetort({ id }, retort) {
     return ajax(`/retorts/${id}.json`, {
-      type: 'POST',
-      data: { retort }
-    }).catch(popupAjaxError)
+      type: "POST",
+      data: { retort },
+    }).catch(popupAjaxError);
   },
 
   disabledCategories() {
-    const categories = this.siteSettings.retort_disabled_categories.split('|');
-    return categories.map(cat => cat.toLowerCase()).filter(Boolean)
+    const categories = this.siteSettings.retort_disabled_categories.split("|");
+    return categories.map((cat) => cat.toLowerCase()).filter(Boolean);
   },
 
   disabledFor(postId) {
-    const post = this.postFor(postId)
-    if (!post) { return true }
+    const post = this.postFor(postId);
+    if (!post) {
+      return true;
+    }
     //if (!post.topic.details.can_create_post) { return true }
     //if (post.get('topic.archived')) { return true }
-    
-    const categoryName = post.get('topic.category.name');
+
+    const categoryName = post.get("topic.category.name");
     const disabledCategories = this.disabledCategories();
-    return categoryName && 
-      disabledCategories.includes(categoryName.toString().toLowerCase());
+    return (
+      categoryName &&
+      disabledCategories.includes(categoryName.toString().toLowerCase())
+    );
   },
 
   openPicker(post) {
-    this.set('picker.isActive', true)
-    this.set('picker.post', post)
+    this.set("picker.isActive", true);
+    this.set("picker.post", post);
   },
 
   setPicker(picker) {
-    this.set('picker', picker)
-    this.set('picker.emojiSelected', retort => (
-      this.updateRetort(picker.post, retort)).then(() => (
-        picker.set('isActive', false)
-      ))
-    )
-  }
-})
+    this.set("picker", picker);
+    this.set("picker.emojiSelected", (retort) =>
+      this.updateRetort(picker.post, retort).then(() =>
+        picker.set("isActive", false)
+      )
+    );
+  },
+});
