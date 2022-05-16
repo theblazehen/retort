@@ -31,8 +31,13 @@ after_initialize do
     before_action :verify_post_and_user, only: :update
 
     def update
-      retort.toggle_user(current_user)
-      respond_with_retort
+      params.require(:retort)
+      if Emoji.exists?(params[:retort])
+        retort.toggle_user(current_user)
+        respond_with_retort
+      else
+        respond_with_unprocessable("Bad Argument")
+      end
     end
 
     private
