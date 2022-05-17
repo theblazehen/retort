@@ -35,18 +35,29 @@ function initializePlugin(api) {
     if (!post.retorts) {
       return;
     }
-    const { username } = api.getCurrentUser();
+    const currentUser = api.getCurrentUser().username;
     const retorts = post.retorts
       .map((item) => {
         item.emojiUrl = emojiUrlFor(item.emoji);
-        item.currentUser = username;
-        item.post = post;
         return item;
       })
       .filter(({ emojiUrl }) => emojiUrl)
-      .map((item) => helper.attach("retort-toggle", item));
+      .sort((a, b) => {
+        if (b.usernames.length != a.usernames.length)
+          return b.usernames.length - a.usernames.length;
+        return a.emoji.localeCompare(b.emoji);
+      });
+    const retort_widgets = retorts.map(({ emoji, emojiUrl, usernames }) =>
+      helper.attach("retort-toggle", {
+        emoji,
+        emojiUrl,
+        post,
+        usernames,
+        currentUser,
+      })
+    );
 
-    return helper.h("div.post-retort-container", retorts);
+    return helper.h("div.post-retort-container", retort_widgets);
   });
 
   api.addPostClassesCallback((attrs) => {
