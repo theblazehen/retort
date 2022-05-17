@@ -36,13 +36,13 @@ function initializePlugin(api) {
       return;
     }
 
-    const retorts = post.retorts.map(({ usernames, emoji }) => {
-      return helper.attach("retort-toggle", {
-        post,
-        usernames,
-        emoji,
-      });
-    });
+    const retorts = post.retorts
+      .map((item) => {
+        item.emojiUrl = emojiUrlFor(item.emoji);
+        return item;
+      })
+      .filter(({ emojiUrl }) => emojiUrl)
+      .map((item) => helper.attach("retort-toggle", item));
 
     return helper.h("div.post-retort-container", retorts);
   });

@@ -8,8 +8,8 @@ export default createWidget("retort-toggle", {
 
   buildKey: (attrs) => `retort-toggle-${attrs.emoji}-${attrs.usernames.length}`,
 
-  defaultState({ emoji, post, usernames }) {
-    return { emoji, post, usernames };
+  defaultState({ emoji, post, usernames, emojiUrl }) {
+    return { emoji, post, usernames, emojiUrl };
   },
 
   click() {
@@ -18,11 +18,9 @@ export default createWidget("retort-toggle", {
   },
 
   html() {
-    const { emoji, usernames } = this.state;
-    const emojUrl = emojiUrlFor(emoji);
-    if (!emojUrl) return [];
+    const { emoji, usernames, emojiUrl } = this.state;
     return [
-      h("img.emoji", { src: emojUrl, alt: `:${emoji}:` }),
+      h("img.emoji", { src: emojiUrl, alt: `:${emoji}:` }),
       usernames.length > 1
         ? h("span.post-retort__count", usernames.length.toString())
         : "",
