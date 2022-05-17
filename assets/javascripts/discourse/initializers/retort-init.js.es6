@@ -35,10 +35,11 @@ function initializePlugin(api) {
     if (!post.retorts) {
       return;
     }
-
+    const { username } = api.getCurrentUser();
     const retorts = post.retorts
       .map((item) => {
         item.emojiUrl = emojiUrlFor(item.emoji);
+        item.currentUser = username;
         return item;
       })
       .filter(({ emojiUrl }) => emojiUrl)

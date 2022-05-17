@@ -6,6 +6,7 @@
 
 register_asset "stylesheets/common/retort.scss"
 register_asset "stylesheets/mobile/retort.scss", :mobile
+register_asset "stylesheets/desktop/retort.scss", :desktop
 
 RETORT_PLUGIN_NAME ||= "retort".freeze
 

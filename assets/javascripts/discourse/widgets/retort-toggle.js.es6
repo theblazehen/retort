@@ -12,6 +12,12 @@ export default createWidget("retort-toggle", {
     return { emoji, post, usernames, emojiUrl };
   },
 
+  buildClasses(attrs) {
+    const { usernames, currentUser } = attrs;
+    if (usernames.includes(currentUser)) return ["my-retort"];
+    else return ["not-my-retort"];
+  },
+
   click() {
     const { post, emoji } = this.state;
     Retort.updateRetort(post, emoji);
