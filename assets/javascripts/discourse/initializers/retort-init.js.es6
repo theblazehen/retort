@@ -40,6 +40,7 @@ function initializePlugin(api) {
       .map((item) => {
         item.emojiUrl = emojiUrlFor(item.emoji);
         item.currentUser = username;
+        item.post = post;
         return item;
       })
       .filter(({ emojiUrl }) => emojiUrl)
