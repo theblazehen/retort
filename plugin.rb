@@ -76,7 +76,8 @@ after_initialize do
   class ::Retort::RetortSerializer < ActiveModel::Serializer
     attributes :post_id, :usernames, :emoji
     define_method :post_id,   -> { object.post_id }
-    define_method :usernames, -> { object.persisted? ? JSON.parse(object.value) : [] }
+    define_method :usernames, -> { object.persisted? ? 
+      JSON.parse(object.value).map{ |id| User.find_by(id: id).username } : [] }
     define_method :emoji,     -> { object.key.split('|').first }
   end
 
@@ -89,7 +90,7 @@ after_initialize do
 
     def self.for_user(user: nil, post: nil)
       for_post(post: post).map    { |r| new(r) }
-                          .select { |r| r.value.include?(user.username) }
+                          .select { |r| r.value.include?(user.id) }
     end
 
     def self.find_by(post: nil, retort: nil)
@@ -101,11 +102,11 @@ after_initialize do
     end
 
     def toggle_user(user)
-      new_value = if value.include? user.username
-        value - Array(user.username)
+      new_value = if value.include? user.id
+        value - Array(user.id)
       else
         purge_other_retorts!(user) unless SiteSetting.retort_allow_multiple_reactions
-        value + Array(user.username)
+        value + Array(user.id)
       end.flatten
 
       if new_value.any?
@@ -150,7 +151,7 @@ after_initialize do
     end
 
     def retort_author
-      @retort_author ||= User.find_by(username: Array(JSON.parse(value)).last)
+      @retort_author ||= User.find_by(id: Array(JSON.parse(value)).last)
     end
 
     def retort_max_per_day
