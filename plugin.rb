@@ -78,7 +78,7 @@ after_initialize do
     attributes :post_id, :usernames, :emoji
     define_method :post_id,   -> { object.post_id }
     define_method :usernames, -> { object.persisted? ? 
-      JSON.parse(object.value).map{ |id| User.find_by(id: id).username } : [] }
+      User.where(id: JSON.parse(object.value)).pluck(:username): [] }
     define_method :emoji,     -> { object.key.split('|').first }
   end
 
