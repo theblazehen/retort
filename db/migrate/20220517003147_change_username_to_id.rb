@@ -3,7 +3,7 @@ class ChangeUsernameToId < ActiveRecord::Migration[7.0]
     details = PostDetail.where(extra: "retort")
     details.each do |detail|
       usernames = JSON.parse(detail.value)
-      ids = User.where(username: username).ids
+      ids = User.where(username: usernames).ids
       detail.value = ids
       detail.save!
     end
