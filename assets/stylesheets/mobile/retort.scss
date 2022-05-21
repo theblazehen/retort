@@ -1,6 +1,7 @@
 .limited-emoji-set {
   width: 300px;
   flex-wrap: wrap;
+  justify-content: space-around;
   img {
     margin: 10px !important;
   }
