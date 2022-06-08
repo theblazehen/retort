@@ -6,3 +6,11 @@
     margin: 10px !important;
   }
 }
+
+.emoji-picker.has-limited-set {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%);
+  min-height: unset;
+}
