@@ -195,10 +195,7 @@ function initializePlugin(api) {
     // Lifted from onShow in emoji-picker. See note in that function concerning its utility.
     applyDiscourseTrick(emojiPicker) {
       schedule("afterRender", () => {
-        if (
-          (!this.site.isMobileDevice || this.isEditorFocused) &&
-          !safariHacksDisabled()
-        ) {
+        if (!this.site.isMobileDevice || this.isEditorFocused) {
           const filter = emojiPicker.querySelector("input.filter");
           filter && filter.focus();
         }
