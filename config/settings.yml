@@ -3,11 +3,13 @@ plugins:
     default: true
     client: true
   retort_allowed_emojis:
-    default: "relaxed|laughing|+1|heart|rage|poop"
+    type: emoji_list
+    default: relaxed|laughing|+1|heart|rage|poop
     client: true
   retort_allow_multiple_reactions:
     default: true
   retort_disabled_categories:
+    type: category_list
     default: ""
     client: true
   retort_max_per_day: 50
