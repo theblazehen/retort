@@ -7,14 +7,11 @@ import {
 } from "discourse-common/utils/decorators";
 import { action } from "@ember/object";
 import { createPopper } from "@popperjs/core";
-import { safariHacksDisabled } from "discourse/lib/utilities";
-import { emojiSearch } from "pretty-text/emoji";
-import TopicRoute from "discourse/routes/topic";
 import Retort from "../lib/retort";
 import User from "discourse/models/user";
 
 function initializePlugin(api) {
-  const { retort_enabled, retort_allowed_emojis, retort_limited_emoji_set } =
+  const { retort_enabled, retort_allowed_emojis } =
     api.container.lookup("site-settings:main");
   const messageBus = api.container.lookup("message-bus:main");
 
@@ -182,7 +179,8 @@ function initializePlugin(api) {
         }
 
         const emojis = retort_allowed_emojis.split("|");
-        const suggestedSection = `
+        const suggestedSection = document.createElement("div");
+        suggestedSection.innerHTML = `
           <div class="section">
             <div class="section-header">
               <span class="title">${I18n.t("retort.section.title")}</span>
@@ -203,7 +201,10 @@ function initializePlugin(api) {
             </div>
           </div>`;
         const emojiContainer = emojiPicker.querySelector(".emojis-container");
-        emojiContainer.innerHTML = suggestedSection + emojiContainer.innerHTML;
+        emojiContainer.insertBefore(
+          suggestedSection,
+          emojiContainer.firstChild
+        );
         // this is a low-tech trick to prevent appending hundreds of emojis
         // of blocking the rendering of the picker
         later(() => {
