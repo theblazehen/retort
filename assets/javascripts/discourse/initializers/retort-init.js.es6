@@ -100,11 +100,6 @@ function initializePlugin(api) {
   api.modifyClass("component:emoji-picker", {
     pluginId: "retort",
 
-    @computed("retort")
-    limited() {
-      return this.retort && retort_limited_emoji_set;
-    },
-
     @computed("retort", "isActive")
     activeRetort() {
       return this.retort && this.isActive;
@@ -130,11 +125,10 @@ function initializePlugin(api) {
     // See onShow in emoj-picker for logic pattern
     @action
     onShowRetort() {
-      if (!this.limited) {
-        this.set("isLoading", true);
-      }
+      this.set("recentEmojis", this.emojiStore.favorites);
 
       schedule("afterRender", () => {
+        this._applyFilter(this.initialFilter);
         document.addEventListener("click", this.handleOutsideClick);
 
         const post = this.post;
@@ -144,136 +138,95 @@ function initializePlugin(api) {
 
         if (!emojiPicker || !retortButton) return false;
 
-        if (!this.site.isMobileDevice) {
-          this._popper = createPopper(retortButton, emojiPicker, {
-            placement: this.limited ? "top" : "bottom",
+        const popperAnchor = retortButton;
+
+        if (!this.site.isMobileDevice && this.usePopper && popperAnchor) {
+          const modifiers = [
+            {
+              name: "preventOverflow",
+            },
+            {
+              name: "offset",
+              options: {
+                offset: [5, 5],
+              },
+            },
+          ];
+
+          if (
+            this.placement === "auto" &&
+            window.innerWidth < popperAnchor.clientWidth * 2
+          ) {
+            modifiers.push({
+              name: "computeStyles",
+              enabled: true,
+              fn({ state }) {
+                state.styles.popper = {
+                  ...state.styles.popper,
+                  position: "fixed",
+                  left: `${
+                    (window.innerWidth - state.rects.popper.width) / 2
+                  }px`,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                };
+
+                return state;
+              },
+            });
+          }
+
+          this._popper = createPopper(popperAnchor, emojiPicker, {
+            placement: this.placement,
           });
         }
 
-        if (this.limited) {
-          const emojis = retort_allowed_emojis.split("|");
-          const basis = 100 / this._emojisPerRow[emojis.length] || 5;
-
-          emojiPicker.innerHTML = `
-            <div class='limited-emoji-set'>
-              ${emojis
-                .map(
-                  (code) => `<img
-                src="${emojiUrlFor(code)}"
-                width=40
-                height=40
-                title='${code}'
-                class='emoji' />`
-                )
-                .join("")}
+        const emojis = retort_allowed_emojis.split("|");
+        const suggestedSection = `
+          <div class="section">
+            <div class="section-header">
+              <span class="title">${I18n.t("retort.section.title")}</span>
             </div>
-          `;
+            <div class="section-group">
+            ${emojis
+              .map(
+                (code) => `<img
+              src="${emojiUrlFor(code)}"
+              width=20
+              height=20
+              loading="lazy"
+              title='${code}'
+              alt='${code}'
+              class='emoji' />`
+              )
+              .join("")}
+            </div>
+          </div>`;
+        const emojiContainer = emojiPicker.querySelector(".emojis-container");
+        emojiContainer.innerHTML = suggestedSection + emojiContainer.innerHTML;
+        // this is a low-tech trick to prevent appending hundreds of emojis
+        // of blocking the rendering of the picker
+        later(() => {
+          schedule("afterRender", () => {
+            if (!this.site.isMobileDevice || this.isEditorFocused) {
+              const filter = emojiPicker.querySelector("input.filter");
+              filter && filter.focus();
 
-          emojiPicker.classList.add("has-limited-set");
-
-          emojiPicker.onclick = (e) => {
-            if (e.target.classList.contains("emoji")) {
-              this.emojiSelected(e.target.title);
-            } else {
-              this.set("isActive", false);
-              this.onClose();
+              if (this._sectionObserver) {
+                emojiPicker
+                  .querySelectorAll(
+                    ".emojis-container .section .section-header"
+                  )
+                  .forEach((p) => this._sectionObserver.observe(p));
+              }
             }
-          };
-        } else {
-          emojiPicker
-            .querySelectorAll(".emojis-container .section .section-header")
-            .forEach((p) => this._sectionObserver.observe(p));
 
-          later(() => {
-            this.set("isLoading", false);
-            this.applyDiscourseTrick(emojiPicker);
-          }, 50);
-        }
+            if (this.selectedDiversity !== 0) {
+              this._applyDiversity(this.selectedDiversity);
+            }
+          });
+        }, 50);
       });
-    },
-
-    // Lifted from onShow in emoji-picker. See note in that function concerning its utility.
-    applyDiscourseTrick(emojiPicker) {
-      schedule("afterRender", () => {
-        if (!this.site.isMobileDevice || this.isEditorFocused) {
-          const filter = emojiPicker.querySelector("input.filter");
-          filter && filter.focus();
-        }
-
-        if (this.selectedDiversity !== 0) {
-          this._applyDiversity(this.selectedDiversity);
-        }
-      });
-    },
-
-    @action
-    onCategorySelection(sectionName) {
-      const section = document.querySelector(
-        `.emoji-picker-emoji-area .section[data-section="${sectionName}"]`
-      );
-      section &&
-        section.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-          inline: "nearest",
-        });
-    },
-
-    @action
-    onFilter(event) {
-      const emojiPickerArea = document.querySelector(
-        ".emoji-picker-emoji-area"
-      );
-      const emojisContainer =
-        emojiPickerArea.querySelector(".emojis-container");
-      const results = emojiPickerArea.querySelector(".results");
-      results.innerHTML = "";
-
-      if (event.target.value) {
-        results.innerHTML = emojiSearch(event.target.value.toLowerCase(), {
-          maxResults: 10,
-          diversity: this.emojiStore.diversity,
-        })
-          .map(this._replaceEmoji)
-          .join("");
-
-        emojisContainer.style.visibility = "hidden";
-        results.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-          inline: "nearest",
-        });
-      } else {
-        emojisContainer.style.visibility = "visible";
-      }
-    },
-
-    _emojisPerRow: {
-      0: 1,
-      1: 1,
-      2: 2,
-      3: 3,
-      4: 4,
-      5: 5,
-      6: 3,
-      7: 3,
-      8: 4,
-      9: 3,
-      10: 5,
-      11: 5,
-      12: 4,
-      13: 5,
-      14: 7,
-      15: 5,
-      16: 4,
-      17: 5,
-      18: 6,
-      19: 6,
-      20: 5,
-      21: 7,
-      22: 5,
-      23: 5,
-      24: 6,
     },
   });
 }

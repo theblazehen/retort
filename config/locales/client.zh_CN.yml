@@ -2,6 +2,8 @@ zh_CN:
   js:
     retort:
       title: '对此帖子添加一个表情'
+      section:
+        title: "推荐"
       reactions:
         one_person:  "%{first} 表示 :%{emoji}:"
         two_people:  "%{first} 和 %{second} 表示 :%{emoji}:"

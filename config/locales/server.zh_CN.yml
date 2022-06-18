@@ -1,7 +1,6 @@
 zh_CN:
   site_settings:
     retort_enabled: "启用 Retort反应 插件."
-    retort_limited_emoji_set: "将能使用的表情限制在下述列表中"
     retort_allowed_emojis: "列出允许使用的表情，使用|分隔"
     retort_emojis_per_row: "选择每行能显示多少个表情（留空将全部显示在同一行）"
     retort_allow_multiple_reactions: "允许用户对同一帖子发布多个表情"
