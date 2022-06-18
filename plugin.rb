@@ -40,7 +40,7 @@ after_initialize do
 
     def retorts
       retorts = Retort.where(post_id: object.id)
-      emojis = retorts.pluck(:emoji)
+      emojis = retorts.pluck(:emoji).uniq
       return emojis.map do |emoji|
         RetortSerializer.new(retorts.where(emoji: emoji)).as_json(root: nil)
       end
