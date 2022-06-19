@@ -8,11 +8,10 @@ register_asset "stylesheets/common/retort.scss"
 register_asset "stylesheets/mobile/retort.scss", :mobile
 register_asset "stylesheets/desktop/retort.scss", :desktop
 
-
 enabled_site_setting :retort_enabled
 
 after_initialize do
-  
+
   module ::DiscourseRetort
     PLUGIN_NAME ||= "retort".freeze
 
@@ -27,7 +26,7 @@ after_initialize do
   require_relative "app/serializers/retorts_serializer.rb"
 
   DiscourseRetort::Engine.routes.draw do
-    post   "/:post_id" => "retorts#update"
+    post "/:post_id" => "retorts#update"
   end
 
   Discourse::Application.routes.append do
@@ -41,7 +40,7 @@ after_initialize do
     def retorts
       retorts = Retort.where(post_id: object.id)
       emojis = retorts.pluck(:emoji).uniq
-      return emojis.map do |emoji|
+      emojis.map do |emoji|
         RetortSerializer.new(retorts.where(emoji: emoji)).as_json(root: nil)
       end
     end
