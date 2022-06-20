@@ -23,7 +23,6 @@ after_initialize do
 
   require_relative "app/controllers/retorts_controller.rb"
   require_relative "app/models/retort.rb"
-  require_relative "app/serializers/retorts_serializer.rb"
 
   DiscourseRetort::Engine.routes.draw do
     post "/:post_id" => "retorts#update"
