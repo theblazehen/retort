@@ -38,11 +38,17 @@ after_initialize do
     attributes :retorts
 
     def retorts
-      retorts = Retort.where(post_id: object.id)
-      emojis = retorts.pluck(:emoji).uniq
-      emojis.map do |emoji|
-        RetortSerializer.new(retorts.where(emoji: emoji)).as_json(root: nil)
+      retorts = Retort.where(post_id: object.id).includes(:user)
+      emojis = Hash.new
+      retorts.map do |retort|
+        emojis[retort.emoji] ||= []
+        emojis[retort.emoji].push(retort.user.username)
       end
+      result = []
+      emojis.each do |key, value|
+        result.push({ post_id: object.id, usernames: value, emoji: key })
+      end
+      result
     end
   end
 
