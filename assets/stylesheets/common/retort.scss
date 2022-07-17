@@ -10,18 +10,17 @@
   float: none;
   border-radius: 5px;
   border: none;
-  margin: 0px 2px;
+  margin: 2px 2px;
   padding: 5px;
   z-index: auto;
   position: relative;
 
   &:hover .post-retort__tooltip {
-    opacity: 1;
+    display: inline;
   }
 
   &__tooltip {
-    opacity: 0;
-    transition: 0.5s opacity;
+    display: none;
     position: absolute;
     margin-top: 30px;
     font-size: 12px;
