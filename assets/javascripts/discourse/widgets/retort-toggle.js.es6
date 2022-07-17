@@ -6,7 +6,7 @@ import Retort from "../lib/retort";
 export default createWidget("retort-toggle", {
   tagName: "button.post-retort",
 
-  buildKey: (attrs) => `retort-toggle-${attrs.emoji}-${attrs.usernames.length}`,
+  buildKey: (attrs) => `retort-toggle-${attrs.post.id}-${attrs.emoji}-${attrs.usernames.length}`,
 
   defaultState({ emoji, post, usernames, emojiUrl }) {
     return { emoji, post, usernames, emojiUrl };
