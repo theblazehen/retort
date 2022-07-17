@@ -98,6 +98,19 @@ function initializePlugin(api) {
   api.modifyClass("component:emoji-picker", {
     pluginId: "retort",
 
+    @action
+    onCategorySelection(sectionName) {
+      const section = document.querySelector(
+        `.emoji-picker-emoji-area .section[data-section="${sectionName}"]`
+      );
+      section &&
+        section.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "start",
+        });
+    },
+
     @computed("retort", "isActive")
     activeRetort() {
       return this.retort && this.isActive;
