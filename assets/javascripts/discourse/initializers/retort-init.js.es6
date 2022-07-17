@@ -1,6 +1,7 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { emojiUrlFor } from "discourse/lib/text";
-import { schedule, later } from "@ember/runloop";
+import discourseLater from "discourse-common/lib/later";
+import { schedule } from "@ember/runloop";
 import {
   default as computed,
   observes,
@@ -172,42 +173,67 @@ function initializePlugin(api) {
               },
             });
           }
-
           this._popper = createPopper(popperAnchor, emojiPicker, {
             placement: this.placement,
           });
         }
 
         const emojis = retort_allowed_emojis.split("|");
-        const suggestedSection = document.createElement("div");
-        suggestedSection.innerHTML = `
-          <div class="section">
-            <div class="section-header">
-              <span class="title">${I18n.t("retort.section.title")}</span>
-            </div>
-            <div class="section-group">
-            ${emojis
-              .map(
-                (code) => `<img
-              src="${emojiUrlFor(code)}"
-              width=20
-              height=20
-              loading="lazy"
-              title='${code}'
-              alt='${code}'
-              class='emoji' />`
-              )
-              .join("")}
-            </div>
-          </div>`;
-        const emojiContainer = emojiPicker.querySelector(".emojis-container");
-        emojiContainer.insertBefore(
-          suggestedSection,
-          emojiContainer.firstChild
-        );
+        if (emojis.length > 0) {
+          const suggestedSection = document.createElement("div");
+          suggestedSection.setAttribute("class", "section");
+          suggestedSection.setAttribute("data-section", "retort");
+          suggestedSection.innerHTML = `
+              <div class="section-header">
+                <span class="title">${I18n.t("retort.section.title")}</span>
+              </div>
+              <div class="section-group">
+              ${emojis
+                .map(
+                  (code) => `<img
+                src="${emojiUrlFor(code)}"
+                width=20
+                height=20
+                loading="lazy"
+                title='${code}'
+                alt='${code}'
+                class='emoji' />`
+                )
+                .join("")}
+              </div>
+            `;
+          const emojiContainer = emojiPicker.querySelector(".emojis-container");
+          emojiContainer.insertBefore(
+            suggestedSection,
+            emojiContainer.firstChild
+          );
+
+          const sectionButton = document.createElement("button");
+          sectionButton.setAttribute("data-section", "retort");
+          sectionButton.setAttribute(
+            "class",
+            "btn btn-default category-button emoji"
+          );
+          sectionButton.setAttribute("type", "button");
+          sectionButton.onclick = () => {
+            this.onCategorySelection("retort");
+          };
+          const firstEmoji = emojis[0];
+          sectionButton.innerHTML = `<img width="20" height="20" src="${emojiUrlFor(
+            firstEmoji
+          )}" title="${firstEmoji}" alt="${firstEmoji}" class="emoji">`;
+          const emojiCategoryButtons = emojiPicker.querySelector(
+            ".emoji-picker-category-buttons"
+          );
+          emojiCategoryButtons.insertBefore(
+            sectionButton,
+            emojiCategoryButtons.firstChild
+          );
+        }
+
         // this is a low-tech trick to prevent appending hundreds of emojis
         // of blocking the rendering of the picker
-        later(() => {
+        discourseLater(() => {
           schedule("afterRender", () => {
             if (!this.site.isMobileDevice || this.isEditorFocused) {
               const filter = emojiPicker.querySelector("input.filter");
