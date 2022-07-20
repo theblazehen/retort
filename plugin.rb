@@ -37,15 +37,11 @@ after_initialize do
     attributes :retorts
 
     def retorts
-      retorts = Retort.where(post_id: object.id).includes(:user)
-      emojis = Hash.new
-      retorts.map do |retort|
-        emojis[retort.emoji] ||= []
-        emojis[retort.emoji].push(retort.user.username)
-      end
+      retort_groups = Retort.where(post_id: object.id).includes(:user).order("created_at").group_by { |r| r.emoji }
       result = []
-      emojis.each do |key, value|
-        result.push({ post_id: object.id, usernames: value, emoji: key })
+      retort_groups.each do |emoji, group|
+        usernames = group.map { |retort| retort.user.username }
+        result.push({ post_id: object.id, usernames: usernames, emoji: emoji })
       end
       result
     end
