@@ -47,4 +47,12 @@ after_initialize do
     end
   end
 
+  class ::User
+    has_many :retorts, dependent: :destroy
+  end
+
+  class ::Post
+    has_many :retorts, dependent: :destroy
+  end
+
 end
