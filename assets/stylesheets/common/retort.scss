@@ -48,4 +48,14 @@
     font-weight: bold;
     color: var(--primary-medium);
   }
+
+  .remove-retort.btn{
+    border: 0px;
+    padding: 0px;
+    display: none;
+  }
+
+  &:hover .remove-retort.btn{
+    display: inline;
+  }
 }

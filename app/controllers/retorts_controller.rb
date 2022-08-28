@@ -1,6 +1,7 @@
 class DiscourseRetort::RetortsController < ::ApplicationController
   requires_plugin DiscourseRetort::PLUGIN_NAME
   before_action :verify_post_and_user, only: :update
+  before_action :verify_post_and_user, only: :delete
 
   def update
     params.require(:retort)
@@ -14,6 +15,25 @@ class DiscourseRetort::RetortsController < ::ApplicationController
       end
     else
       respond_with_unprocessable("Bad Argument")
+    end
+  end
+
+  def remove
+    params.require(:retort)
+    if current_user.staff?
+      retort ||= Retort.remove_retort(post.id, params[:retort])
+      if retort
+        UserHistory.create!(
+          acting_user_id: current_user.id,
+          action: UserHistory.actions[:post_edit],
+          post_id: post.id,
+          details: "remove retort :#{params[:retort]}:"
+        )
+        MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}", serialized_post_retorts
+        render json: { success: :ok }
+      end
+    else
+      respond_with_unprocessable("Unable to remove that retort.")
     end
   end
 

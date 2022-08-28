@@ -26,6 +26,7 @@ after_initialize do
 
   DiscourseRetort::Engine.routes.draw do
     post "/:post_id" => "retorts#update"
+    delete "/:post_id" => "retorts#remove"
   end
 
   Discourse::Application.routes.append do

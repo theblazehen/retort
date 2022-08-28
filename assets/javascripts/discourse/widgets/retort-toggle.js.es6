@@ -2,6 +2,30 @@ import { h } from "virtual-dom";
 import { emojiUrlFor } from "discourse/lib/text";
 import { createWidget } from "discourse/widgets/widget";
 import Retort from "../lib/retort";
+import hbs from "discourse/widgets/hbs-compiler";
+
+createWidget("retort-remove-emoji", {
+  tagName: "a.remove-retort.no-text.btn-icon.btn",
+  template: hbs`{{d-icon "times"}}`,
+
+  buildKey: (attrs) => `retort-remove-${attrs.post.id}-${attrs.emoji}`,
+
+  defaultState({ emoji, post }) {
+    return { emoji, post};
+  },
+
+  click() {
+    const { post, emoji } = this.state;
+    bootbox.confirm(
+      I18n.t("retort.confirm_remove"),
+      (confirmed) => {
+        if (confirmed) {
+          Retort.removeRetort(post, emoji);
+        }
+      }
+    );
+  },
+});
 
 export default createWidget("retort-toggle", {
   tagName: "button.post-retort",
@@ -14,7 +38,7 @@ export default createWidget("retort-toggle", {
 
   buildClasses(attrs) {
     const { usernames, currentUser } = attrs;
-    if (usernames.includes(currentUser)) return ["my-retort"];
+    if (usernames.includes(currentUser.username)) return ["my-retort"];
     else return ["not-my-retort"];
   },
 
@@ -23,15 +47,20 @@ export default createWidget("retort-toggle", {
     Retort.updateRetort(post, emoji);
   },
 
-  html() {
+  html(attrs) {
     const { emoji, usernames, emojiUrl } = this.state;
-    return [
+    const res = [
       h("img.emoji", { src: emojiUrl, alt: `:${emoji}:` }),
       usernames.length > 1
         ? h("span.post-retort__count", usernames.length.toString())
         : "",
       h("span.post-retort__tooltip", this.sentence(this.state)),
     ];
+    if (attrs.currentUser &&
+          (attrs.currentUser.trust_level == 4 || attrs.currentUser.staff)) {
+      res.push(this.attach("retort-remove-emoji", attrs));
+    }
+    return res;
   },
 
   sentence({ usernames, emoji }) {

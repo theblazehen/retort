@@ -33,7 +33,7 @@ function initializePlugin(api) {
     if (!post.retorts) {
       return;
     }
-    const currentUser = api.getCurrentUser().username;
+    const currentUser = api.getCurrentUser();
     const retorts = post.retorts
       .map((item) => {
         item.emojiUrl = emojiUrlFor(item.emoji);

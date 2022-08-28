@@ -46,6 +46,13 @@ export default Ember.Object.create({
     }).catch(popupAjaxError);
   },
 
+  removeRetort({ id }, retort) {
+    return ajax(`/retorts/${id}.json`, {
+      type: "DELETE",
+      data: { retort },
+    }).catch(popupAjaxError);
+  },
+
   disabledCategories() {
     const categories = this.siteSettings.retort_disabled_categories.split("|");
     return categories.map((cat) => cat.toLowerCase()).filter(Boolean);
