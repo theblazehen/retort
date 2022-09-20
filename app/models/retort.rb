@@ -6,14 +6,15 @@ class Retort < ActiveRecord::Base
   validates :emoji, presence: true
   validates_associated :post, :user, presence: true
 
-  def self.toggle_user(post_id, user_id, emoji)
-    exist_record = Retort.find_by(post_id: post_id, user_id: user_id, emoji: emoji)
-      if exist_record
-        exist_record.destroy!
-      else
-        exist_record = Retort.create(post_id: post_id, user_id: user_id, emoji: emoji)
-      end
-      exist_record
+  def toggle(actor_id)
+    if self.deleted_at
+      self.deleted_at = nil
+      self.deleted_by = nil
+    else
+      self.deleted_at = Time.now
+      self.deleted_by = actor_id
+    end
+    self.save!
   end
 
   def self.remove_retort(post_id, emoji)

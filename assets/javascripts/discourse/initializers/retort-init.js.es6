@@ -40,11 +40,7 @@ function initializePlugin(api) {
         return item;
       })
       .filter(({ emojiUrl }) => emojiUrl)
-      .sort((a, b) => {
-        if (b.usernames.length != a.usernames.length)
-          return b.usernames.length - a.usernames.length;
-        return a.emoji.localeCompare(b.emoji);
-      });
+      .sort((a, b) => a.emoji.localeCompare(b.emoji));
     const retort_widgets = retorts.map(({ emoji, emojiUrl, usernames }) =>
       helper.attach("retort-toggle", {
         emoji,
@@ -99,111 +95,110 @@ function initializePlugin(api) {
     pluginId: "retort",
 
     @action
-    onCategorySelection(sectionName) {
-      const section = document.querySelector(
-        `.emoji-picker-emoji-area .section[data-section="${sectionName}"]`
-      );
-      section &&
-        section.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-          inline: "start",
-        });
-    },
+  onCategorySelection(sectionName) {
+    const section = document.querySelector(
+      `.emoji-picker-emoji-area .section[data-section="${sectionName}"]`
+    );
+    section &&
+      section.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "start",
+      });
+  },
 
-    @computed("retort", "isActive")
-    activeRetort() {
-      return this.retort && this.isActive;
-    },
+  @computed("retort", "isActive")
+  activeRetort() {
+    return this.retort && this.isActive;
+  },
 
-    @observes("isActive")
-    _setup() {
-      if (this.retort) {
-        this._setupRetort();
-      } else {
-        this._super();
-      }
-    },
+  @observes("isActive")
+  _setup() {
+    if (this.retort) {
+      this._setupRetort();
+    } else {
+      this._super();
+    }
+  },
 
-    _setupRetort() {
-      if (this.isActive) {
-        this.onShowRetort();
-      } else {
-        this.onClose();
-      }
-    },
+  _setupRetort() {
+    if (this.isActive) {
+      this.onShowRetort();
+    } else {
+      this.onClose();
+    }
+  },
 
-    // See onShow in emoj-picker for logic pattern
-    @action
-    onShowRetort() {
-      this.set("recentEmojis", this.emojiStore.favorites);
+  // See onShow in emoj-picker for logic pattern
+  @action
+  onShowRetort() {
+    this.set("recentEmojis", this.emojiStore.favorites);
 
-      schedule("afterRender", () => {
-        this._applyFilter(this.initialFilter);
-        document.addEventListener("click", this.handleOutsideClick);
+    schedule("afterRender", () => {
+      this._applyFilter(this.initialFilter);
+      document.addEventListener("click", this.handleOutsideClick);
 
-        const post = this.post;
-        const emojiPicker = document.querySelector(".emoji-picker");
-        const retortButton = document.querySelector(`
+      const post = this.post;
+      const emojiPicker = document.querySelector(".emoji-picker");
+      const retortButton = document.querySelector(`
           article[data-post-id="${post.id}"] .post-controls .retort`);
 
-        if (!emojiPicker || !retortButton) return false;
+      if (!emojiPicker || !retortButton) return false;
 
-        const popperAnchor = retortButton;
+      const popperAnchor = retortButton;
 
-        if (!this.site.isMobileDevice && this.usePopper && popperAnchor) {
-          const modifiers = [
-            {
-              name: "preventOverflow",
+      if (!this.site.isMobileDevice && this.usePopper && popperAnchor) {
+        const modifiers = [
+          {
+            name: "preventOverflow",
+          },
+          {
+            name: "offset",
+            options: {
+              offset: [5, 5],
             },
-            {
-              name: "offset",
-              options: {
-                offset: [5, 5],
-              },
-            },
-          ];
+          },
+        ];
 
-          if (
-            this.placement === "auto" &&
-            window.innerWidth < popperAnchor.clientWidth * 2
-          ) {
-            modifiers.push({
-              name: "computeStyles",
-              enabled: true,
-              fn({ state }) {
-                state.styles.popper = {
-                  ...state.styles.popper,
-                  position: "fixed",
-                  left: `${
-                    (window.innerWidth - state.rects.popper.width) / 2
+        if (
+          this.placement === "auto" &&
+          window.innerWidth < popperAnchor.clientWidth * 2
+        ) {
+          modifiers.push({
+            name: "computeStyles",
+            enabled: true,
+            fn({ state }) {
+              state.styles.popper = {
+                ...state.styles.popper,
+                position: "fixed",
+                left: `${(window.innerWidth - state.rects.popper.width) / 2
                   }px`,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                };
+                top: "50%",
+                transform: "translateY(-50%)",
+              };
 
-                return state;
-              },
-            });
-          }
-          this._popper = createPopper(popperAnchor, emojiPicker, {
-            placement: this.placement,
+              return state;
+            },
           });
         }
+        this._popper = createPopper(popperAnchor, emojiPicker, {
+          placement: this.placement,
+        });
+      }
 
-        const emojis = retort_allowed_emojis.split("|");
-        if (emojis.length > 0) {
-          const suggestedSection = document.createElement("div");
-          suggestedSection.setAttribute("class", "section");
-          suggestedSection.setAttribute("data-section", "retort");
-          suggestedSection.innerHTML = `
+      const emojis = retort_allowed_emojis.split("|");
+      if (emojis.length > 0) {
+        const suggestedSection = document.createElement("div");
+        suggestedSection.setAttribute("class", "section");
+        suggestedSection.setAttribute("data-section", "retort");
+        suggestedSection.innerHTML = `
               <div class="section-header">
                 <span class="title">${I18n.t("retort.section.title")}</span>
               </div>
               <div class="section-group">
               ${emojis
-                .map(
-                  (code) => `<img
+            .map(
+              (code) => `<img
                 src="${emojiUrlFor(code)}"
                 width=20
                 height=20
@@ -211,64 +206,64 @@ function initializePlugin(api) {
                 title='${code}'
                 alt='${code}'
                 class='emoji' />`
-                )
-                .join("")}
+            )
+            .join("")}
               </div>
             `;
-          const emojiContainer = emojiPicker.querySelector(".emojis-container");
-          emojiContainer.insertBefore(
-            suggestedSection,
-            emojiContainer.firstChild
-          );
+        const emojiContainer = emojiPicker.querySelector(".emojis-container");
+        emojiContainer.insertBefore(
+          suggestedSection,
+          emojiContainer.firstChild
+        );
 
-          const sectionButton = document.createElement("button");
-          sectionButton.setAttribute("data-section", "retort");
-          sectionButton.setAttribute(
-            "class",
-            "btn btn-default category-button emoji"
-          );
-          sectionButton.setAttribute("type", "button");
-          sectionButton.onclick = () => {
-            this.onCategorySelection("retort");
-          };
-          const firstEmoji = emojis[0];
-          sectionButton.innerHTML = `<img width="20" height="20" src="${emojiUrlFor(
-            firstEmoji
-          )}" title="${firstEmoji}" alt="${firstEmoji}" class="emoji">`;
-          const emojiCategoryButtons = emojiPicker.querySelector(
-            ".emoji-picker-category-buttons"
-          );
-          emojiCategoryButtons.insertBefore(
-            sectionButton,
-            emojiCategoryButtons.firstChild
-          );
-        }
+        const sectionButton = document.createElement("button");
+        sectionButton.setAttribute("data-section", "retort");
+        sectionButton.setAttribute(
+          "class",
+          "btn btn-default category-button emoji"
+        );
+        sectionButton.setAttribute("type", "button");
+        sectionButton.onclick = () => {
+          this.onCategorySelection("retort");
+        };
+        const firstEmoji = emojis[0];
+        sectionButton.innerHTML = `<img width="20" height="20" src="${emojiUrlFor(
+          firstEmoji
+        )}" title="${firstEmoji}" alt="${firstEmoji}" class="emoji">`;
+        const emojiCategoryButtons = emojiPicker.querySelector(
+          ".emoji-picker-category-buttons"
+        );
+        emojiCategoryButtons.insertBefore(
+          sectionButton,
+          emojiCategoryButtons.firstChild
+        );
+      }
 
-        // this is a low-tech trick to prevent appending hundreds of emojis
-        // of blocking the rendering of the picker
-        discourseLater(() => {
-          schedule("afterRender", () => {
-            if (!this.site.isMobileDevice || this.isEditorFocused) {
-              const filter = emojiPicker.querySelector("input.filter");
-              filter && filter.focus();
+      // this is a low-tech trick to prevent appending hundreds of emojis
+      // of blocking the rendering of the picker
+      discourseLater(() => {
+        schedule("afterRender", () => {
+          if (!this.site.isMobileDevice || this.isEditorFocused) {
+            const filter = emojiPicker.querySelector("input.filter");
+            filter && filter.focus();
 
-              if (this._sectionObserver) {
-                emojiPicker
-                  .querySelectorAll(
-                    ".emojis-container .section .section-header"
-                  )
-                  .forEach((p) => this._sectionObserver.observe(p));
-              }
+            if (this._sectionObserver) {
+              emojiPicker
+                .querySelectorAll(
+                  ".emojis-container .section .section-header"
+                )
+                .forEach((p) => this._sectionObserver.observe(p));
             }
+          }
 
-            if (this.selectedDiversity !== 0) {
-              this._applyDiversity(this.selectedDiversity);
-            }
-          });
-        }, 50);
-      });
-    },
-  });
+          if (this.selectedDiversity !== 0) {
+            this._applyDiversity(this.selectedDiversity);
+          }
+        });
+      }, 50);
+    });
+  },
+});
 }
 
 export default {

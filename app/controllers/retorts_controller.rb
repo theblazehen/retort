@@ -5,17 +5,33 @@ class DiscourseRetort::RetortsController < ::ApplicationController
 
   def update
     params.require(:retort)
-    if Emoji.exists?(params[:retort])
-      retort ||= Retort.toggle_user(post.id, current_user.id, params[:retort])
-      if retort && retort.valid?
-        MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}", serialized_post_retorts
-        render json: { success: :ok }
-      else
-        respond_with_unprocessable("Unable to save that retort. Please try again")
-      end
-    else
+    emoji = params[:retort]
+    if !Emoji.exists?(emoji)
       respond_with_unprocessable("Bad Argument")
+      return
     end
+    
+    disabled_emojis = SiteSetting.retort_disabled_emojis.split("|")
+    if disabled_emojis.include?(emoji)
+      respond_with_unprocessable("Unable to save that retort.")
+      return
+    end
+
+    exist_record = Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
+    if exist_record
+      if (!(current_user.staff? || current_user.trust_level == 4)) && 
+        exist_record.updated_at < SiteSetting.retort_withdraw_tolerance.second.ago
+        respond_with_unprocessable("Exceed max withdraw time limit.")
+        return
+      end
+      exist_record.toggle(current_user.id)
+    else
+      exist_record = Retort.create(post_id: post.id, user_id: current_user.id, emoji: emoji)
+    end
+
+    MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}", serialized_post_retorts
+    render json: { success: :ok }
+ 
   end
 
   def remove
