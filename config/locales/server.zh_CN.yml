@@ -9,3 +9,5 @@ zh_CN:
     retort_tl2_max_per_day_multiplier: "增加TL2（成员）的频率限制倍数"
     retort_tl3_max_per_day_multiplier: "增加TL3（活跃用户）的频率限制倍数"
     retort_tl4_max_per_day_multiplier: "增加TL4（资深）的频率限制倍数"
+    retort_disabled_emojis: "在 Retort 中禁用这些表情"
+    retort_withdraw_tolerance: "最多（n）秒内可撤回表情"

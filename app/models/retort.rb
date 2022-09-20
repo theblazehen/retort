@@ -6,16 +6,6 @@ class Retort < ActiveRecord::Base
   validates :emoji, presence: true
   validates_associated :post, :user, presence: true
 
-  def self.toggle_user(post_id, user_id, emoji)
-    exist_record = Retort.find_by(post_id: post_id, user_id: user_id, emoji: emoji)
-      if exist_record
-        exist_record.destroy!
-      else
-        exist_record = Retort.create(post_id: post_id, user_id: user_id, emoji: emoji)
-      end
-      exist_record
-  end
-
   include RateLimiter::OnCreateRecord
   rate_limit :retort_rate_limiter
   def retort_rate_limiter

@@ -6,6 +6,14 @@ plugins:
     type: emoji_list
     default: relaxed|laughing|+1|heart|rage|poop
     client: true
+  retort_disabled_emojis:
+    type: emoji_list
+    default: ""
+    client: false
+  retort_withdraw_tolerance:
+    type: number
+    default: 5
+    client: false
   retort_allow_multiple_reactions:
     default: true
   retort_disabled_categories:
