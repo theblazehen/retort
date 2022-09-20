@@ -36,17 +36,18 @@ class DiscourseRetort::RetortsController < ::ApplicationController
 
   def remove
     params.require(:retort)
+    emoji = params[:retort]
     if !(current_user.staff? || current_user.trust_level == 4)
       respond_with_unprocessable("You are not permitted to modify this.")
     end
     
-    result = Retort.remove_retort(post.id, params[:retort])
+    result = Retort.remove_retort(post.id, emoji, current_user.id)
     if result
       UserHistory.create!(
         acting_user_id: current_user.id,
         action: UserHistory.actions[:post_edit],
         post_id: post.id,
-        details: "remove retort :#{params[:retort]}:"
+        details: "remove retort :#{emoji}:"
       )
     end
     MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}", serialized_post_retorts
