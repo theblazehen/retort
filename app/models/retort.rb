@@ -6,6 +6,17 @@ class Retort < ActiveRecord::Base
   validates :emoji, presence: true
   validates_associated :post, :user, presence: true
 
+  def toggle(actor_id)
+    if self.deleted_at
+      self.deleted_at = nil
+      self.deleted_by = nil
+    else
+      self.deleted_at = Time.now
+      self.deleted_by = actor_id
+    end
+    self.save!
+  end
+
   include RateLimiter::OnCreateRecord
   rate_limit :retort_rate_limiter
   def retort_rate_limiter

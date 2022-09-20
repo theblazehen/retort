@@ -37,7 +37,7 @@ after_initialize do
     attributes :retorts
 
     def retorts
-      retort_groups = Retort.where(post_id: object.id).includes(:user).order("created_at").group_by { |r| r.emoji }
+      retort_groups = Retort.where(post_id: object.id, deleted_at: nil).includes(:user).order("created_at").group_by { |r| r.emoji }
       result = []
       retort_groups.each do |emoji, group|
         usernames = group.map { |retort| retort.user.username }

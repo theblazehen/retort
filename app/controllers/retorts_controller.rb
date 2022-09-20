@@ -17,13 +17,13 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     end
 
     exist_record = Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
-    if exist_record && exist_record.created_at < SiteSetting.retort_withdraw_tolerance.second.ago
-      respond_with_unprocessable("Exceed max withdraw time limit.")
-      return
-    end
-
     if exist_record
-      exist_record.destroy!
+      if (!(current_user.staff? || current_user.trust_level == 4)) && 
+        exist_record.updated_at < SiteSetting.retort_withdraw_tolerance.second.ago
+        respond_with_unprocessable("Exceed max withdraw time limit.")
+        return
+      end
+      exist_record.toggle(current_user.id)
     else
       exist_record = Retort.create(post_id: post.id, user_id: current_user.id, emoji: emoji)
     end
