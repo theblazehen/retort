@@ -1,6 +1,7 @@
 class DiscourseRetort::RetortsController < ::ApplicationController
   requires_plugin DiscourseRetort::PLUGIN_NAME
   before_action :verify_post_and_user, only: :update
+  before_action :verify_post_and_user, only: :delete
 
   def update
     params.require(:retort)
@@ -33,7 +34,26 @@ class DiscourseRetort::RetortsController < ::ApplicationController
  
   end
 
-    private
+  def remove
+    params.require(:retort)
+    if !(current_user.staff? || current_user.trust_level == 4)
+      respond_with_unprocessable("You are not permitted to modify this.")
+    end
+    
+    result = Retort.remove_retort(post.id, params[:retort])
+    if result
+      UserHistory.create!(
+        acting_user_id: current_user.id,
+        action: UserHistory.actions[:post_edit],
+        post_id: post.id,
+        details: "remove retort :#{params[:retort]}:"
+      )
+    end
+    MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}", serialized_post_retorts
+    render json: { success: :ok }
+  end
+
+  private
 
   def post
     @post ||= Post.find_by(id: params[:post_id]) if params[:post_id]

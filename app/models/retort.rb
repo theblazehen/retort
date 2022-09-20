@@ -17,6 +17,15 @@ class Retort < ActiveRecord::Base
     self.save!
   end
 
+  def self.remove_retort(post_id, emoji, actor_id)
+    exist_record = Retort.where(post_id: post_id, emoji: emoji)
+    if exist_record
+      exist_record.update_all(deleted_at: Time.now, deleted_by: actor_id)
+      return true
+    end
+    return false
+  end
+
   include RateLimiter::OnCreateRecord
   rate_limit :retort_rate_limiter
   def retort_rate_limiter
