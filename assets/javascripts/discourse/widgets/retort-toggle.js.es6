@@ -11,13 +11,13 @@ createWidget("retort-remove-emoji", {
   buildKey: (attrs) => `retort-remove-${attrs.post.id}-${attrs.emoji}`,
 
   defaultState({ emoji, post }) {
-    return { emoji, post};
+    return { emoji, post };
   },
 
   click() {
     const { post, emoji } = this.state;
     bootbox.confirm(
-      I18n.t("retort.confirm_remove"),
+      I18n.t("retort.confirm_remove", { emoji }),
       (confirmed) => {
         if (confirmed) {
           Retort.removeRetort(post, emoji);
@@ -57,7 +57,7 @@ export default createWidget("retort-toggle", {
       h("span.post-retort__tooltip", this.sentence(this.state)),
     ];
     if (attrs.currentUser &&
-          (attrs.currentUser.trust_level == 4 || attrs.currentUser.staff)) {
+      (attrs.currentUser.trust_level == 4 || attrs.currentUser.staff)) {
       res.push(this.attach("retort-remove-emoji", attrs));
     }
     return res;

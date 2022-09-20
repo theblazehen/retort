@@ -49,13 +49,13 @@
     color: var(--primary-medium);
   }
 
-  .remove-retort.btn{
-    border: 0px;
+  .remove-retort.btn {
     padding: 0px;
+    margin-left: 4px;
     display: none;
   }
 
-  &:hover .remove-retort.btn{
-    display: inline;
+  &:hover .remove-retort.btn {
+    display: inline-block;
   }
 }
