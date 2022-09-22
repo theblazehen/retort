@@ -7,21 +7,20 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     params.require(:retort)
     emoji = params[:retort]
     if !Emoji.exists?(emoji)
-      respond_with_unprocessable("Bad Argument")
+      respond_with_unprocessable(I18n.t("retort.error.missing_emoji"))
       return
     end
     
     disabled_emojis = SiteSetting.retort_disabled_emojis.split("|")
     if disabled_emojis.include?(emoji)
-      respond_with_unprocessable("Unable to save that retort.")
+      respond_with_unprocessable(I18n.t("retort.error.disabled_emojis"))
       return
     end
 
     exist_record = Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
     if exist_record
-      if (!(current_user.staff? || current_user.trust_level == 4)) && 
-        exist_record.updated_at < SiteSetting.retort_withdraw_tolerance.second.ago
-        respond_with_unprocessable("Exceed max withdraw time limit.")
+      if !exist_record.can_toggle(current_user)
+        respond_with_unprocessable(I18n.t("retort.error.exceed_withdraw_limit"))
         return
       end
       exist_record.toggle(current_user.id)
@@ -38,7 +37,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     params.require(:retort)
     emoji = params[:retort]
     if !(current_user.staff? || current_user.trust_level == 4)
-      respond_with_unprocessable("You are not permitted to modify this.")
+      respond_with_unprocessable(I18n.t("retort.error.guardian_fail"))
     end
     
     result = Retort.remove_retort(post.id, emoji, current_user.id)
@@ -47,7 +46,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
         acting_user_id: current_user.id,
         action: UserHistory.actions[:post_edit],
         post_id: post.id,
-        details: "remove retort :#{emoji}:"
+        details: I18n.t("retort.log.remove", emoji: emoji)
       )
     end
     MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}", serialized_post_retorts
@@ -61,8 +60,8 @@ class DiscourseRetort::RetortsController < ::ApplicationController
   end
 
   def verify_post_and_user
-    respond_with_unprocessable("Unable to find post #{params[:post_id]}") unless post
-    respond_with_unprocessable("You are not permitted to modify this") unless current_user && !current_user.silenced?
+    respond_with_unprocessable(I18n.t("retort.error.missing_post", post_id: params[:post_id])) unless post
+    respond_with_unprocessable(I18n.t("retort.error.guardian_fail")) unless current_user && !current_user.silenced?
   end
 
   def serialized_post_retorts
@@ -70,6 +69,6 @@ class DiscourseRetort::RetortsController < ::ApplicationController
   end
 
   def respond_with_unprocessable(error)
-    render json: { errors: error }, status: :unprocessable_entity
+    render json: { error: error }, status: :unprocessable_entity
   end
 end

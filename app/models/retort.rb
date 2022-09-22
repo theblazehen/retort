@@ -17,6 +17,15 @@ class Retort < ActiveRecord::Base
     self.save!
   end
 
+  def can_toggle(user)
+    # staff can do anything
+    return true if user.staff? || user.trust_level == 4 
+    # deleted retort can be recovered
+    return true if self.deleted_at
+    # cannot delete old retort
+    return self.updated_at > SiteSetting.retort_withdraw_tolerance.second.ago
+  end
+
   def self.remove_retort(post_id, emoji, actor_id)
     exist_record = Retort.where(post_id: post_id, emoji: emoji)
     if exist_record

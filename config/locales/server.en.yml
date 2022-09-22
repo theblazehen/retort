@@ -11,3 +11,12 @@ en:
     retort_tl4_max_per_day_multiplier: "Increase limit of retorts per day for tl4 (leader) by multiplying with this number"
     retort_disabled_emojis: "Disable these emojis in retort"
     retort_withdraw_tolerance: "Can withdraw emojis in (n) seconds"
+  retort:
+    log:
+      remove: "Remove retort %{emoji}"
+    error:
+      missing_emoji: "Missing emoji in request!"
+      missing_post: "No post exists for %{post_id}!"
+      disabled_emojis: "This emoji is disabled by admin."
+      exceed_withdraw_limit: "Exceed max withdraw time limit."
+      guardian_fail: "You are not permitted to modify this."
