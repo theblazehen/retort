@@ -13,10 +13,10 @@ zh_CN:
     retort_withdraw_tolerance: "最多（n）秒内可撤回表情"
   retort:
     log:
-      remove: "移除 Retort 表情 {emoji}"
+      remove: "移除 Retort 表情 :%{emoji}:"
     error:
       missing_emoji: "请求参数缺失 emoji ！"
-      missing_post: "编号 {post_id} 对应的发帖不存在！"
+      missing_post: "编号 %{post_id} 对应的帖子不存在！"
       disabled_emojis: "该表情已被管理员禁用。"
       exceed_withdraw_limit: "超过最大可撤回时间。"
       guardian_fail: "你的权限不允许作此操作！"

@@ -13,7 +13,7 @@ en:
     retort_withdraw_tolerance: "Can withdraw emojis in (n) seconds"
   retort:
     log:
-      remove: "Remove retort %{emoji}"
+      remove: "Remove retort :%{emoji}:"
     error:
       missing_emoji: "Missing emoji in request!"
       missing_post: "No post exists for %{post_id}!"
