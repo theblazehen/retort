@@ -1,7 +1,6 @@
 class DiscourseRetort::RetortsController < ::ApplicationController
   requires_plugin DiscourseRetort::PLUGIN_NAME
-  before_action :verify_post_and_user, only: :update
-  before_action :verify_post_and_user, only: :delete
+  before_action :verify_post_and_user, only: [:update, :delete]
 
   def update
     params.require(:retort)
