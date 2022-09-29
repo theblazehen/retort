@@ -37,6 +37,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     emoji = params[:retort]
     if !(current_user.staff? || current_user.trust_level == 4)
       respond_with_unprocessable(I18n.t("retort.error.guardian_fail"))
+      return
     end
     
     result = Retort.remove_retort(post.id, emoji, current_user.id)
