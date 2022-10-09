@@ -5,8 +5,7 @@ import User from "discourse/models/user";
 
 function initializePlugin(api) {
   const { retort_enabled } = api.container.lookup("site-settings:main");
-  const messageBus = api.container.lookup("message-bus:main");
-
+  
   if (!retort_enabled) {
     return;
   }
@@ -59,8 +58,8 @@ function initializePlugin(api) {
     pluginId: "retort",
 
     setupController(controller, model) {
+      const messageBus = api.container.lookup("message-bus:main");
       Retort.initialize(messageBus, model);
-
       this._super(controller, model);
     },
   });
