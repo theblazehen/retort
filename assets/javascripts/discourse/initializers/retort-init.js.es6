@@ -24,7 +24,7 @@ function initializePlugin(api) {
     let postId = helper.getModel().id;
     let post = Retort.postFor(postId);
 
-    if (Retort.disabledFor(postId)) {
+    if (Retort.disabledForPost(postId)) {
       return;
     }
 
@@ -55,7 +55,7 @@ function initializePlugin(api) {
   });
 
   api.addPostClassesCallback((attrs) => {
-    if (!Retort.disabledFor(attrs.id)) {
+    if (!Retort.disabledForPost(attrs.id)) {
       return ["retort"];
     }
   });
@@ -75,7 +75,7 @@ function initializePlugin(api) {
   });
 
   api.addPostMenuButton("retort", (attrs) => {
-    if (Retort.disabledFor(attrs.id)) {
+    if (Retort.disabledForPost(attrs.id) || !attrs.canCreatePost) {
       return;
     }
     return {

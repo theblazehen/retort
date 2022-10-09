@@ -58,7 +58,7 @@ export default Ember.Object.create({
     return categories.map((cat) => cat.toLowerCase()).filter(Boolean);
   },
 
-  disabledFor(postId) {
+  disabledForPost(postId) {
     const post = this.postFor(postId);
     if (!post) {
       return true;
