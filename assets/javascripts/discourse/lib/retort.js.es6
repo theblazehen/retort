@@ -77,6 +77,14 @@ export default Ember.Object.create({
   openPicker(post) {
     this.set("picker.isActive", true);
     this.set("picker.post", post);
+    this.set("picker.onEmojiPickerClose", (event) => {
+      const retortAnchor = document.querySelector(".emoji-picker-anchor.retort");
+      if (retortAnchor) {
+        retortAnchor.classList.remove("emoji-picker-anchor")
+      }
+      this.set("picker.isActive", false);
+    }
+    );
   },
 
   setPicker(picker) {
