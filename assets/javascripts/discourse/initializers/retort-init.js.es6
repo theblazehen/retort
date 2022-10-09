@@ -80,13 +80,14 @@ function initializePlugin(api) {
 
   api.attachWidgetAction("post-menu", "clickRetort", function () {
     const post = this.findAncestorModel()
-    const retortAnchor = document.querySelector(`
-          article[data-post-id="${post.id}"] .post-controls .retort`);
-    if (retortAnchor) {
-      retortAnchor.classList.add("emoji-picker-anchor")
-    }
     Retort.openPicker(post);
   });
+
+  api.registerConnectorClass("above-footer", "emoji-picker-wrapper", {
+    setupComponent(args, component) {
+      Retort.setPicker(component);
+    }
+  })
 }
 
 export default {

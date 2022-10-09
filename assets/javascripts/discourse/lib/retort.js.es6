@@ -75,6 +75,12 @@ export default Ember.Object.create({
   },
 
   openPicker(post) {
+    const retortAnchor = document.querySelector(`
+          article[data-post-id="${post.id}"] .post-controls .retort`);
+    if (retortAnchor) {
+      retortAnchor.classList.add("emoji-picker-anchor")
+    }
+
     this.set("picker.isActive", true);
     this.set("picker.post", post);
     this.set("picker.onEmojiPickerClose", (event) => {
