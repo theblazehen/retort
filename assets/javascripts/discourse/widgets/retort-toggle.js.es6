@@ -1,5 +1,4 @@
 import { h } from "virtual-dom";
-import { emojiUrlFor } from "discourse/lib/text";
 import { createWidget } from "discourse/widgets/widget";
 import Retort from "../lib/retort";
 import hbs from "discourse/widgets/hbs-compiler";
