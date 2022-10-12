@@ -56,8 +56,9 @@ export default createWidget("retort-toggle", {
         : "",
       h("span.post-retort__tooltip", this.sentence(this.state)),
     ];
-    if (attrs.currentUser &&
-      (attrs.currentUser.trust_level == 4 || attrs.currentUser.staff)) {
+    if ((!Retort.disableRetortButton(this.state.post.id))
+      && attrs.currentUser
+      && (attrs.currentUser.trust_level == 4 || attrs.currentUser.staff)) {
       res.push(this.attach("retort-remove-emoji", attrs));
     }
     return res;

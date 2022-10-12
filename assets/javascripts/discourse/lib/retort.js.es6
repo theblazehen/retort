@@ -58,20 +58,23 @@ export default Ember.Object.create({
     return categories.map((cat) => cat.toLowerCase()).filter(Boolean);
   },
 
-  disabledForPost(postId) {
+  disableShowForPost(postId) {
     const post = this.postFor(postId);
     if (!post) {
       return true;
     }
-    //if (!post.topic.details.can_create_post) { return true }
-    //if (post.get('topic.archived')) { return true }
-
     const categoryName = post.get("topic.category.name");
     const disabledCategories = this.disabledCategories();
     return (
       categoryName &&
       disabledCategories.includes(categoryName.toString().toLowerCase())
     );
+  },
+
+  disableRetortButton(postId) {
+    if (this.disableShowForPost(postId)) return true;
+    if (this.topic.archived) return true;
+    return false;
   },
 
   openPicker(post) {

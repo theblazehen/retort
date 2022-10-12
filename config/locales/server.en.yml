@@ -20,3 +20,4 @@ en:
       disabled_emojis: "This emoji is disabled by admin."
       exceed_withdraw_limit: "Exceed max withdraw time limit."
       guardian_fail: "You are not permitted to modify this."
+      archived_topic: "Cannot retort in archived topics"

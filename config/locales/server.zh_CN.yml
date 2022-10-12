@@ -20,3 +20,4 @@ zh_CN:
       disabled_emojis: "该表情已被管理员禁用。"
       exceed_withdraw_limit: "超过最大可撤回时间。"
       guardian_fail: "你的权限不允许作此操作！"
+      archived_topic: "该话题已归档。"

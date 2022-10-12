@@ -5,7 +5,7 @@ import User from "discourse/models/user";
 
 function initializePlugin(api) {
   const { retort_enabled } = api.container.lookup("site-settings:main");
-  
+
   if (!retort_enabled) {
     return;
   }
@@ -14,7 +14,7 @@ function initializePlugin(api) {
     let postId = helper.getModel().id;
     let post = Retort.postFor(postId);
 
-    if (Retort.disabledForPost(postId)) {
+    if (Retort.disableShowForPost(postId)) {
       return;
     }
 
@@ -45,7 +45,7 @@ function initializePlugin(api) {
   });
 
   api.addPostClassesCallback((attrs) => {
-    if (!Retort.disabledForPost(attrs.id)) {
+    if (!Retort.disableShowForPost(attrs.id)) {
       return ["retort"];
     }
   });
@@ -65,7 +65,7 @@ function initializePlugin(api) {
   });
 
   api.addPostMenuButton("retort", (attrs) => {
-    if (Retort.disabledForPost(attrs.id) || !attrs.canCreatePost) {
+    if (Retort.disableRetortButton(attrs.id)) {
       return;
     }
     return {
