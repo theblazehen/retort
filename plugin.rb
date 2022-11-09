@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # name: retort
 # about: Reactions plugin for Discourse
 # version: 1.2.3
