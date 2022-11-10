@@ -33,9 +33,8 @@ function initializePlugin(api) {
       .sort((a, b) => a.emoji.localeCompare(b.emoji));
     const retort_widgets = retorts.map(({ emoji, emojiUrl, usernames }) => {
       var displayUsernames = usernames;
-      // staff will see all users
-      if (!(currentUser &&
-        (currentUser.trust_level == 4 || currentUser.staff))) {
+      // check if hide_ignored_retorts is enabled
+      if (currentUser?.custom_fields?.hide_ignored_retorts) {
         const ignoredUsers = new Set(currentUser.ignored_users);
         displayUsernames = usernames.filter((username) => {
           return !ignoredUsers.has(username);
@@ -58,6 +57,16 @@ function initializePlugin(api) {
 
     return helper.h("div.post-retort-container", retort_widgets);
   });
+
+  api.modifyClass("controller:preferences/notifications", {
+    pluginId: "retort",
+    actions: {
+      save() {
+        this.get('saveAttrNames').push('custom_fields')
+        this._super()
+      }
+    }
+  })
 
   api.addPostClassesCallback((attrs) => {
     if (!Retort.disableShowForPost(attrs.id)) {
