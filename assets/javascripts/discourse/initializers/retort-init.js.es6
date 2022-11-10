@@ -31,14 +31,29 @@ function initializePlugin(api) {
       })
       .filter(({ emojiUrl }) => emojiUrl)
       .sort((a, b) => a.emoji.localeCompare(b.emoji));
-    const retort_widgets = retorts.map(({ emoji, emojiUrl, usernames }) =>
-      helper.attach("retort-toggle", {
-        emoji,
-        emojiUrl,
-        post,
-        usernames,
-        currentUser,
-      })
+    const retort_widgets = retorts.map(({ emoji, emojiUrl, usernames }) => {
+      var displayUsernames = usernames;
+      // staff will see all users
+      if (!(currentUser &&
+        (currentUser.trust_level == 4 || currentUser.staff))) {
+        const ignoredUsers = new Set(currentUser.ignored_users);
+        displayUsernames = usernames.filter((username) => {
+          return !ignoredUsers.has(username);
+        });
+      }
+      if (displayUsernames.length > 0) {
+        return helper.attach("retort-toggle", {
+          emoji,
+          emojiUrl,
+          post,
+          usernames: displayUsernames,
+          currentUser,
+        })
+      }
+      else {
+        return null;
+      }
+    }
     );
 
     return helper.h("div.post-retort-container", retort_widgets);
