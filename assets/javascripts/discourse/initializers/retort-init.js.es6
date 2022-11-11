@@ -9,6 +9,19 @@ function initializePlugin(api) {
   if (!retort_enabled) {
     return;
   }
+  const currentUser = api.getCurrentUser();
+
+  api.modifyClass("controller:preferences/notifications", {
+    pluginId: "retort",
+    actions: {
+      save() {
+        this.get('saveAttrNames').push('custom_fields')
+        this._super()
+      }
+    }
+  })
+
+  if (currentUser?.custom_fields?.disable_retorts) return;
 
   api.decorateWidget("post-contents:after-cooked", (helper) => {
     let postId = helper.getModel().id;
@@ -23,7 +36,7 @@ function initializePlugin(api) {
     if (!post.retorts) {
       return;
     }
-    const currentUser = api.getCurrentUser();
+
     const retorts = post.retorts
       .map((item) => {
         item.emojiUrl = emojiUrlFor(item.emoji);
@@ -58,25 +71,12 @@ function initializePlugin(api) {
     return helper.h("div.post-retort-container", retort_widgets);
   });
 
-  api.modifyClass("controller:preferences/notifications", {
-    pluginId: "retort",
-    actions: {
-      save() {
-        this.get('saveAttrNames').push('custom_fields')
-        this._super()
-      }
-    }
-  })
 
   api.addPostClassesCallback((attrs) => {
     if (!Retort.disableShowForPost(attrs.id)) {
       return ["retort"];
     }
   });
-
-  if (!User.current()) {
-    return;
-  }
 
   api.modifyClass("route:topic", {
     pluginId: "retort",
