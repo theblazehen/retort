@@ -1,25 +1,33 @@
 .my-retort {
-  background-color: var(--primary-low);
+  background-color: var(--tertiary-very-low);
+  border: 1px solid var(--tertiary-medium);
 }
 
 .not-my-retort {
   background-color: transparent;
+  border: 1px solid var(--primary-low);
 }
 
 .post-retort {
   float: none;
-  border-radius: 5px;
-  border: none;
+  border-radius: 8px;
   margin: 2px 2px;
   padding: 5px;
   z-index: auto;
   position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  img {
+    margin-right: 4px;
+  }
 
   &:hover .post-retort__tooltip {
     display: inline;
   }
 
   &__tooltip {
+    align-self: flex-start;
     display: none;
     position: absolute;
     margin-top: 30px;
@@ -29,7 +37,6 @@
     max-width: 150px;
     background: var(--primary);
     color: var(--secondary);
-    font-weight: bold;
     padding: 5px;
     border-radius: 5px;
     word-wrap: normal;
@@ -49,13 +56,15 @@
     color: var(--primary-medium);
   }
 
-  .remove-retort.btn {
+  .remove-retort {
+    color: var(--primary-medium);
     padding: 0px;
     margin-left: 4px;
     display: none;
   }
 
-  &:hover .remove-retort.btn {
+  &:hover .remove-retort {
+    align-self: center;
     display: inline-block;
   }
 }

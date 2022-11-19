@@ -4,7 +4,7 @@ import Retort from "../lib/retort";
 import hbs from "discourse/widgets/hbs-compiler";
 
 createWidget("retort-remove-emoji", {
-  tagName: "a.remove-retort.no-text.btn-icon.btn",
+  tagName: "a.remove-retort",
   template: hbs`{{d-icon "times"}}`,
 
   buildKey: (attrs) => `retort-remove-${attrs.post.id}-${attrs.emoji}`,
@@ -50,9 +50,7 @@ export default createWidget("retort-toggle", {
     const { emoji, usernames, emojiUrl } = this.state;
     const res = [
       h("img.emoji", { src: emojiUrl, alt: `:${emoji}:` }),
-      usernames.length > 1
-        ? h("span.post-retort__count", usernames.length.toString())
-        : "",
+      h("span.post-retort__count", usernames.length.toString()),
       h("span.post-retort__tooltip", this.sentence(this.state)),
     ];
     if ((!Retort.disableRetortButton(this.state.post.id))
