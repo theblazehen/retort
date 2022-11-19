@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class LoadFromPostDetail < ActiveRecord::Migration[7.0]
   def change
     old_retorts = PostDetail.where(extra: "retort")

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class DiscourseRetort::RetortsController < ::ApplicationController
   requires_plugin DiscourseRetort::PLUGIN_NAME
   before_action :verify_post_and_user, only: [:update, :remove]
@@ -9,7 +10,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
       respond_with_unprocessable(I18n.t("retort.error.missing_emoji"))
       return
     end
-    
+
     disabled_emojis = SiteSetting.retort_disabled_emojis.split("|")
     if disabled_emojis.include?(emoji)
       respond_with_unprocessable(I18n.t("retort.error.disabled_emojis"))
@@ -29,7 +30,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
 
     MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}", serialized_post_retorts
     render json: { success: :ok }
- 
+
   end
 
   def remove
@@ -39,7 +40,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
       respond_with_unprocessable(I18n.t("retort.error.guardian_fail"))
       return
     end
-    
+
     result = Retort.remove_retort(post.id, emoji, current_user.id)
     if result
       UserHistory.create!(

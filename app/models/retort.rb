@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_dependency 'rate_limiter'
 
 class Retort < ActiveRecord::Base
@@ -19,11 +21,11 @@ class Retort < ActiveRecord::Base
 
   def can_toggle(user)
     # staff can do anything
-    return true if user.staff? || user.trust_level == 4 
+    return true if user.staff? || user.trust_level == 4
     # deleted retort can be recovered
     return true if self.deleted_at
     # cannot delete old retort
-    return self.updated_at > SiteSetting.retort_withdraw_tolerance.second.ago
+    self.updated_at > SiteSetting.retort_withdraw_tolerance.second.ago
   end
 
   def self.remove_retort(post_id, emoji, actor_id)
@@ -32,7 +34,7 @@ class Retort < ActiveRecord::Base
       exist_record.update_all(deleted_at: Time.now, deleted_by: actor_id)
       return true
     end
-    return false
+    false
   end
 
   include RateLimiter::OnCreateRecord

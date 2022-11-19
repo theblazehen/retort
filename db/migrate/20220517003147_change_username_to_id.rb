@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class ChangeUsernameToId < ActiveRecord::Migration[7.0]
   def change
     details = PostDetail.where(extra: "retort")
