@@ -61,6 +61,10 @@
     padding: 0px;
     margin-left: 4px;
     display: none;
+
+    &:hover {
+      background-color: var(--primary-low);
+    }
   }
 
   &:hover .remove-retort {
