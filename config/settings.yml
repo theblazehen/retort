@@ -16,6 +16,10 @@ plugins:
     type: category_list
     default: ""
     client: true
+  retort_disabled_users:
+    type: list
+    default: ""
+    client: false
   retort_max_per_day: 50
   retort_tl2_max_per_day_multiplier: 1.5
   retort_tl3_max_per_day_multiplier: 2
