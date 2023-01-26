@@ -1,5 +1,6 @@
 import { ajax } from "discourse/lib/ajax";
 import { getOwner } from "discourse-common/lib/get-owner";
+import { popupAjaxError } from "discourse/lib/ajax-error";
 
 export default Ember.Object.create({
   topic: { postStream: { posts: [] } },
@@ -100,7 +101,7 @@ export default Ember.Object.create({
     this.set("picker.emojiSelected", (retort) =>
       this.updateRetort(picker.post, retort).then(() =>
         picker.set("isActive", false)
-      )
+      ).catch(popupAjaxError)
     );
   },
 });
