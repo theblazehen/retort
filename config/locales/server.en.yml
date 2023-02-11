@@ -11,6 +11,7 @@ en:
     retort_tl3_max_per_day_multiplier: "Increase limit of retorts per day for tl3 (regular) by multiplying with this number"
     retort_tl4_max_per_day_multiplier: "Increase limit of retorts per day for tl4 (leader) by multiplying with this number"
     retort_disabled_emojis: "Disable these emojis in retort"
+    retort_chat_disabled_emojis: "Disable these emojis in chat"
     retort_withdraw_tolerance: "Can withdraw emojis in (n) seconds"
   retort:
     log:

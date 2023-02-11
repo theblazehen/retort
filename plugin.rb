@@ -73,7 +73,7 @@ after_initialize do
     def check_react
       params.require(%i[emoji])
 
-      disabled_emojis = SiteSetting.retort_disabled_emojis.split("|")
+      disabled_emojis = SiteSetting.retort_chat_disabled_emojis.split("|")
       if disabled_emojis.include?(params[:emoji])
         render json: { error: I18n.t("retort.error.disabled_emojis") }, status: :unprocessable_entity
       end
