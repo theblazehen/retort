@@ -6,6 +6,10 @@ plugins:
     type: emoji_list
     default: ""
     client: false
+  retort_chat_disabled_emojis:
+    type: emoji_list
+    default: ""
+    client: false
   retort_withdraw_tolerance:
     type: number
     default: 5
