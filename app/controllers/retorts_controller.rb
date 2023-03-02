@@ -34,6 +34,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
         return
       end
       exist_record = Retort.create(post_id: post.id, user_id: current_user.id, emoji: emoji)
+      DiscourseEvent.trigger(:create_retort,post,current_user,emoji)
     end
 
     MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}", serialized_post_retorts
