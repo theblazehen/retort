@@ -54,7 +54,7 @@ class Retort < ActiveRecord::Base
   end
 
   def self.can_create?(user,post,emoji)
-    return false if user.silenced? || SiteSetting.retort_disabled_users.split("|").include?(current_user.username)
+    return false if user.silenced? || SiteSetting.retort_disabled_users.split("|").include?(user.username)
     return false if SiteSetting.retort_disabled_emojis.split("|").include?(emoji)
     return true if user.staff? || user.trust_level == 4
     return false if post.topic.archived?
