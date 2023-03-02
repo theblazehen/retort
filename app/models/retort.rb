@@ -8,15 +8,39 @@ class Retort < ActiveRecord::Base
   validates :emoji, presence: true
   validates_associated :post, :user, presence: true
 
-  def toggle(actor_id)
-    if self.deleted_at
-      self.deleted_at = nil
-      self.deleted_by = nil
+  def deleted?
+    return self.deleted_at.nil?
+  end
+
+  def toggle!(user)
+    if !self.deleted_at.nil?
+      self.recreate!(user)
     else
-      self.deleted_at = Time.now
-      self.deleted_by = actor_id
+      self.withdraw!(user)
     end
     self.save!
+  end
+
+  def withdraw!(user)
+    self.deleted_at = Time.now
+    self.deleted_by = user.id
+  end
+
+  def recreate!(user)
+    self.deleted_at = nil
+    self.deleted_by = nil
+  end
+
+  def can_recreate?(user)
+    return false if !Retort.can_create?(user,self.post,self.emoji)
+    return true if user.staff? || user.trust_level == 4
+    return true if self.deleted_at && self.deleted_by != user.id
+    false
+  end
+
+  def can_withdraw?(user)
+    return true if user.staff? || user.trust_level == 4
+    self.updated_at > SiteSetting.retort_withdraw_tolerance.second.ago
   end
 
   def can_toggle?(user)
@@ -24,13 +48,16 @@ class Retort < ActiveRecord::Base
     # staff can do anything
     return true if user.staff? || user.trust_level == 4
     # deleted retort can be recovered
-    return true if self.deleted_at
+    return true if self.deleted_at && self.deleted_by != user.id
     # cannot delete old retort
     self.updated_at > SiteSetting.retort_withdraw_tolerance.second.ago
   end
 
   def self.can_create?(user,post,emoji)
-    return false if SiteSetting.retort_disabled_users.split("|").include?(user.username)
+    return false if user.silenced? || SiteSetting.retort_disabled_users.split("|").include?(current_user.username)
+    return false if SiteSetting.retort_disabled_emojis.split("|").include?(emoji)
+    return true if user.staff? || user.trust_level == 4
+    return false if post.topic.archived?
     true
   end
 
