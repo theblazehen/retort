@@ -9,7 +9,7 @@ class Retort < ActiveRecord::Base
   validates_associated :post, :user, presence: true
 
   def deleted?
-    return self.deleted_at.nil?
+    return !self.deleted_at.nil?
   end
 
   def toggle!(user)
