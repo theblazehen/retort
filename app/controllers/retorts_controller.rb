@@ -26,6 +26,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
           DiscourseEvent.trigger(:create_retort,post,current_user,emoji)
         else
           respond_with_unprocessable(I18n.t("retort.error.guardian_fail"))
+          return
         end
       else
         if exist_record.can_withdraw?
@@ -33,15 +34,17 @@ class DiscourseRetort::RetortsController < ::ApplicationController
           DiscourseEvent.trigger(:withdraw_retort,post,current_user,emoji)
         else
           respond_with_unprocessable(I18n.t("retort.error.exceed_withdraw_limit"))
+          return
         end
       end
     else
       if !Retort.can_create?(current_user,post,emoji)
         respond_with_unprocessable(I18n.t("retort.error.guardian_fail"))
         return
+      else
+        exist_record = Retort.create!(post_id: post.id, user_id: current_user.id, emoji: emoji)
+        DiscourseEvent.trigger(:create_retort,post,current_user,emoji)
       end
-      exist_record = Retort.create(post_id: post.id, user_id: current_user.id, emoji: emoji)
-      DiscourseEvent.trigger(:create_retort,post,current_user,emoji)
     end
 
     MessageBus.publish "/retort/topics/#{params[:topic_id] || post.topic_id}", serialized_post_retorts
