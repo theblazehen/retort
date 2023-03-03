@@ -19,15 +19,22 @@ class DiscourseRetort::RetortsController < ::ApplicationController
 
     exist_record = Retort.find_by(post_id: post.id, user_id: current_user.id, emoji: emoji)
     if exist_record
-      if !exist_record.can_toggle?(current_user)
-        if exist_record.deleted?
+      if exist_record.deleted?
+        # Record has been deleted, try to create again
+        if exist_record.can_recreate?
+          exist_record.recreate!
+          DiscourseEvent.trigger(:create_retort,post,current_user,emoji)
+        else
           respond_with_unprocessable(I18n.t("retort.error.guardian_fail"))
+        end
+      else
+        if exist_record.can_withdraw?
+          exist_record.withdraw!
+          DiscourseEvent.trigger(:withdraw_retort,post,current_user,emoji)
         else
           respond_with_unprocessable(I18n.t("retort.error.exceed_withdraw_limit"))
         end
-        return
       end
-      exist_record.toggle!(current_user)
     else
       if !Retort.can_create?(current_user,post,emoji)
         respond_with_unprocessable(I18n.t("retort.error.guardian_fail"))

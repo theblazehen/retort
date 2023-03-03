@@ -9,44 +9,49 @@ class Retort < ActiveRecord::Base
   validates_associated :post, :user, presence: true
 
   def deleted?
-    return self.deleted_at.nil?
+    return !self.deleted_at.nil?
   end
 
-  def toggle!(user)
-    if !self.deleted_at.nil?
-      self.recreate!(user)
+  def toggle!
+    if self.deleted?
+      self.recreate!
     else
-      self.withdraw!(user)
+      self.withdraw!
     end
     self.save!
   end
 
-  def withdraw!(user)
+  def withdraw!
     self.deleted_at = Time.now
     self.deleted_by = user.id
+    self.save!
   end
 
-  def recreate!(user)
+  def recreate!
     self.deleted_at = nil
     self.deleted_by = nil
+    self.save!
   end
 
-  def can_recreate?(user)
-    return false if !Retort.can_create?(user,self.post,self.emoji)
-    return true if user.staff? || user.trust_level == 4
-    return true if self.deleted_at && self.deleted_by != user.id
+  def can_recreate?
+    # If it cannot be created, it must not be recreated
+    return false if !Retort.can_create?(self.user,self.post,self.emoji)
+    return true if self.user.staff? || self.user.trust_level == 4
+    # withdrawn by self, can be recreated
+    return true if self.deleted_at && self.deleted_by == self.user.id
     false
   end
 
-  def can_withdraw?(user)
-    return true if user.staff? || user.trust_level == 4
-    self.updated_at > SiteSetting.retort_withdraw_tolerance.second.ago
+  def can_withdraw?
+    return true if self.user.staff? || self.user.trust_level == 4
+    return true self.updated_at > SiteSetting.retort_withdraw_tolerance.second.ago
+    false
   end
 
-  def can_toggle?(user)
+  def can_toggle?
     return false if self.deleted_at and !Retort.can_create?(user,self.post,self.emoji)
     # staff can do anything
-    return true if user.staff? || user.trust_level == 4
+    return true if self.user.staff? || self.user.trust_level == 4
     # deleted retort can be recovered
     return true if self.deleted_at && self.deleted_by != user.id
     # cannot delete old retort
