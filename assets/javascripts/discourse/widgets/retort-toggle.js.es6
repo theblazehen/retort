@@ -32,12 +32,14 @@ export default createWidget("retort-toggle", {
 
   buildKey: (attrs) => `retort-toggle-${attrs.post.id}-${attrs.emoji}-${attrs.usernames.length}`,
 
-  defaultState({ emoji, post, usernames, emojiUrl}) {
-    return { emoji, post, usernames, emojiUrl};
+  defaultState({ emoji, post, usernames, emojiUrl }) {
+    const is_my_retort = usernames.includes(this.currentUser.username);
+    return { emoji, post, usernames, emojiUrl, is_my_retort};
   },
 
-  buildClasses(attrs) {
-    if (this.state.usernames.includes(this.currentUser.username)) return ["my-retort"];
+  buildClasses() {
+    if (this.state.usernames.length <= 0) return ["nobody-retort"];
+    else if (this.state.is_my_retort) return ["my-retort"];
     else return ["not-my-retort"];
   },
 
@@ -47,11 +49,13 @@ export default createWidget("retort-toggle", {
   },
 
   updateWidget() {
-    const index = this.state.usernames.indexOf(this.currentUser.username);
-    if (index > -1) { 
-      this.state.usernames.splice(index, 1); 
+    if (this.state.is_my_retort) { 
+      const index = this.state.usernames.indexOf(this.currentUser.username);
+      this.state.usernames.splice(index, 1);
+      this.state.is_my_retort = false;
     } else {
       this.state.usernames.push(this.currentUser.username);
+      this.state.is_my_retort = true;
     }
     this.scheduleRerender()
   },
