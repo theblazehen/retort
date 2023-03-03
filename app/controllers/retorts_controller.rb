@@ -82,7 +82,7 @@ class DiscourseRetort::RetortsController < ::ApplicationController
   def verify_post_and_user
     respond_with_unprocessable(I18n.t("retort.error.missing_post", post_id: params[:post_id])) unless post
     respond_with_unprocessable(I18n.t("retort.error.guardian_fail")) unless current_user && !current_user.silenced?
-    respond_with_unprocessable(I18n.t("retort.error.guardian_fail")) unless Guardian.new(current_user).can_see_post?
+    respond_with_unprocessable(I18n.t("retort.error.guardian_fail")) unless Guardian.new(current_user).can_see_post?(post)
     respond_with_unprocessable(I18n.t("retort.error.archived_topic")) if post.topic.archived?
   end
 
