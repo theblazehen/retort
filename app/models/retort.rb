@@ -44,7 +44,7 @@ class Retort < ActiveRecord::Base
 
   def can_withdraw?
     return true if self.user.staff? || self.user.trust_level == 4
-    return true self.updated_at > SiteSetting.retort_withdraw_tolerance.second.ago
+    return true if self.updated_at > SiteSetting.retort_withdraw_tolerance.second.ago
     false
   end
 
