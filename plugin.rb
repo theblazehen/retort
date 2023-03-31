@@ -42,7 +42,7 @@ after_initialize do
       "30_days" => Retort.where("created_at > ?", 30.days.ago).count,
       :previous_30_days =>
       Retort.where("created_at BETWEEN ? AND ?", 60.days.ago, 30.days.ago).count,
-      :count => ChatMessage.count,
+      :count => Retort.count,
     }
   end
 
