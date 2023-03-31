@@ -12,3 +12,5 @@ zh_CN:
         two_people:  "%{first} 和 %{second} 表示 :%{emoji}:"
         many_people: "%{first}，%{second} 和其他 %{count} 人表示 :%{emoji}:"
       confirm_remove:  "确认删除 %{emoji} 吗？此操作不可逆！"
+    about:
+      retort_count: "表情"

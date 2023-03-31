@@ -2,7 +2,7 @@
 
 # name: retort
 # about: Reactions plugin for Discourse
-# version: 1.2.9
+# version: 1.3.0
 # authors: Jiajun Du, pangbo. original: James Kiesel (gdpelican)
 # url: https://github.com/ShuiyuanSJTU/retort
 
@@ -34,6 +34,17 @@ after_initialize do
 
   register_editable_user_custom_field :hide_ignored_retorts
   register_editable_user_custom_field :disable_retorts
+
+  register_about_stat_group("retort", show_in_ui: true) do 
+    {
+      :last_day => Retort.where("created_at > ?", 1.days.ago).count,
+      "7_days" => Retort.where("created_at > ?", 7.days.ago).count,
+      "30_days" => Retort.where("created_at > ?", 30.days.ago).count,
+      :previous_30_days =>
+      Retort.where("created_at BETWEEN ? AND ?", 60.days.ago, 30.days.ago).count,
+      :count => ChatMessage.count,
+    }
+  end
 
   DiscourseRetort::Engine.routes.draw do
     post "/:post_id" => "retorts#update"
