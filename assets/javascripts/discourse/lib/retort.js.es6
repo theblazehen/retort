@@ -55,7 +55,7 @@ export default Ember.Object.create({
 
   disabledCategories() {
     const categories = this.siteSettings.retort_disabled_categories.split("|");
-    return categories.map((cat) => cat.toLowerCase()).filter(Boolean);
+    return categories.map((cat) => parseInt(cat)).filter(Boolean);
   },
 
   disableShowForPost(postId) {
@@ -63,11 +63,11 @@ export default Ember.Object.create({
     if (!post) {
       return true;
     }
-    const categoryName = post.get("topic.category.name");
+    const categoryId = post.get("topic.category.id");
     const disabledCategories = this.disabledCategories();
     return (
-      categoryName &&
-      disabledCategories.includes(categoryName.toString().toLowerCase())
+      categoryId &&
+      disabledCategories.includes(categoryId)
     );
   },
 
