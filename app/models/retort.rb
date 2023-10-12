@@ -8,6 +8,9 @@ class Retort < ActiveRecord::Base
   validates :emoji, presence: true
   validates_associated :post, :user, presence: true
 
+  after_save :clear_cache
+  after_destroy :clear_cache
+
   def deleted?
     return !self.deleted_at.nil?
   end
@@ -88,5 +91,14 @@ class Retort < ActiveRecord::Base
   def retort_trust_multiplier
     return 1.0 unless user&.trust_level.to_i >= 2
       SiteSetting.send(:"retort_tl#{user.trust_level}_max_per_day_multiplier")
+  end
+
+  def self.cache_key(post_id)
+    "retort-#{post_id}"
+  end
+
+  def clear_cache
+    Discourse.cache.delete(Retort.cache_key(self.post_id))
+    true
   end
 end
