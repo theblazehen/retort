@@ -2,7 +2,7 @@
 
 # name: retort
 # about: Reactions plugin for Discourse
-# version: 1.3.1
+# version: 1.3.2
 # authors: Jiajun Du, pangbo. original: James Kiesel (gdpelican)
 # url: https://github.com/ShuiyuanSJTU/retort
 
@@ -93,4 +93,5 @@ after_initialize do
     end
   end
 
+  DiscourseEvent.trigger(:plugin_retort_initialized)
 end
