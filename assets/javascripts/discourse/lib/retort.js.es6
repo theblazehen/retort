@@ -1,5 +1,5 @@
 import { ajax } from "discourse/lib/ajax";
-import { getOwner } from "discourse-common/lib/get-owner";
+import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 
 export default Ember.Object.create({
@@ -24,7 +24,7 @@ export default Ember.Object.create({
       }
     );
 
-    const siteSettings = getOwner(this).lookup("site-settings:main");
+    const siteSettings = getOwnerWithFallback(this).lookup("site-settings:main");
     this.set("siteSettings", siteSettings);
   },
 

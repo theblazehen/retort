@@ -106,11 +106,6 @@ function initializePlugin(api) {
     Retort.openPicker(post);
   });
 
-  api.registerConnectorClass("above-footer", "emoji-picker-wrapper", {
-    setupComponent(args, component) {
-      Retort.setPicker(component);
-    }
-  })
 }
 
 export default {
