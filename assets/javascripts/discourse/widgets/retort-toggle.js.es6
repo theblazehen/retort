@@ -44,6 +44,9 @@ export default createWidget("retort-toggle", {
   },
 
   click() {
+    if (this.currentUser == null) {
+      return
+    }
     const { post, emoji } = this.state;
     Retort.updateRetort(post, emoji).then(this.updateWidget.bind(this)).catch(popupAjaxError);
   },
