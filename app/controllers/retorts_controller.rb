@@ -21,8 +21,8 @@ class DiscourseRetort::RetortsController < ::ApplicationController
     if exist_record
       if exist_record.deleted?
         # Record has been deleted, try to create again
-        if exist_record.can_recreate?
-          exist_record.recreate!
+        if exist_record.can_recover?
+          exist_record.recover!
           DiscourseEvent.trigger(:create_retort,post,current_user,emoji)
         else
           respond_with_unprocessable(I18n.t("retort.error.guardian_fail"))

@@ -17,7 +17,7 @@ class Retort < ActiveRecord::Base
 
   def toggle!
     if self.deleted?
-      self.recreate!
+      self.recover!
     else
       self.withdraw!
     end
@@ -30,17 +30,17 @@ class Retort < ActiveRecord::Base
     self.save!
   end
 
-  def recreate!
+  def recover!
     self.deleted_at = nil
     self.deleted_by = nil
     self.save!
   end
 
-  def can_recreate?
-    # If it cannot be created, it must not be recreated
+  def can_recover?
+    # If it cannot be created, it must not be recoverd
     return false if !Retort.can_create?(self.user,self.post,self.emoji)
     return true if self.user.staff? || self.user.trust_level == 4
-    # withdrawn by self, can be recreated
+    # withdrawn by self, can be recoverd
     return true if self.deleted_at && self.deleted_by == self.user.id
     false
   end
