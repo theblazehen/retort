@@ -1,6 +1,7 @@
 import { h } from "virtual-dom";
 import { createWidget } from "discourse/widgets/widget";
 import { popupAjaxError } from "discourse/lib/ajax-error";
+import { getOwnerWithFallback  } from "discourse-common/lib/get-owner";
 import Retort from "../lib/retort";
 import hbs from "discourse/widgets/hbs-compiler";
 
@@ -16,12 +17,11 @@ createWidget("retort-remove-emoji", {
 
   click() {
     const { post, emoji } = this.state;
-    bootbox.confirm(
-      I18n.t("retort.confirm_remove", { emoji }),
-      (confirmed) => {
-        if (confirmed) {
-          Retort.removeRetort(post, emoji).catch(popupAjaxError);
-        }
+    const dialog = getOwnerWithFallback(this).lookup("service:dialog");
+    dialog.confirm({
+        title: I18n.t("retort.confirm_remove.title"),
+        message: I18n.t("retort.confirm_remove.message", { emoji }),
+        didConfirm: () => Retort.removeRetort(post, emoji).catch(popupAjaxError),
       }
     );
   },
