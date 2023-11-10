@@ -73,6 +73,7 @@ class Retort < ActiveRecord::Base
     exist_record = Retort.where(post_id: post_id, emoji: emoji)
     if exist_record
       exist_record.update_all(deleted_at: Time.now, deleted_by: actor_id)
+      Retort.clear_cache(post_id)
       return true
     end
     false
@@ -98,7 +99,22 @@ class Retort < ActiveRecord::Base
   end
 
   def clear_cache
-    Discourse.cache.delete(Retort.cache_key(self.post_id))
-    true
+    Retort.clear_cache(self.post_id)
+  end
+
+  def self.clear_cache(post_id)
+    Discourse.cache.delete(Retort.cache_key(post_id))
+  end
+
+  def self.serialize_for_post(post)
+    Discourse.cache.fetch(Retort.cache_key(post.id)) do
+      retort_groups = Retort.where(post_id: post.id, deleted_at: nil).includes(:user).order("created_at").group_by { |r| r.emoji }
+      result = []
+      retort_groups.each do |emoji, group|
+        usernames = group.map { |retort| retort.user.username }
+        result.push({ post_id: post.id, usernames: usernames, emoji: emoji })
+      end
+      result
+    end
   end
 end

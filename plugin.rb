@@ -2,7 +2,7 @@
 
 # name: retort
 # about: Reactions plugin for Discourse
-# version: 1.3.6
+# version: 1.3.7
 # authors: Jiajun Du, pangbo. original: James Kiesel (gdpelican)
 # url: https://github.com/ShuiyuanSJTU/retort
 
@@ -60,15 +60,7 @@ after_initialize do
     attributes :retorts
 
     def retorts
-      Discourse.cache.fetch(Retort.cache_key(object.id)) do
-        retort_groups = Retort.where(post_id: object.id, deleted_at: nil).includes(:user).order("created_at").group_by { |r| r.emoji }
-        result = []
-        retort_groups.each do |emoji, group|
-          usernames = group.map { |retort| retort.user.username }
-          result.push({ post_id: object.id, usernames: usernames, emoji: emoji })
-        end
-        result
-      end
+      Retort.serialize_for_post(object)
     end
   end
 
