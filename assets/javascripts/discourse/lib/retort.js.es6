@@ -1,5 +1,5 @@
 import { ajax } from "discourse/lib/ajax";
-import { getOwnerWithFallback } from "discourse-common/lib/get-owner";
+import { getOwnerWithFallback } from "@ember/application";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import Object from '@ember/object';
 
